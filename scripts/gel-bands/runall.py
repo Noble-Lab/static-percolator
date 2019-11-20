@@ -199,7 +199,7 @@ def main():
     palette = wispy.theme.paper()
 
     # Make index
-    tide_idx = make_index(FASTA, "mouse.index")
+    tide_idx = make_index(FASTA, "human.index")
 
     # Search and Percolate training files
     train_name = "train"

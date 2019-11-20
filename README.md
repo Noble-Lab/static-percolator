@@ -36,9 +36,12 @@ verify Crux has been added to your path.
 
 
 ### Data  
-The data directory structure is expected to look like this:
+The directory structure is expected to look like this. Note that the `results`
+directory will not exist until the analyses are run:
 ```
 README.md (this file)
+scripts (where the analysis scripts are)
+results (where the results are written)
 data
 |- mzML
 |  |- 2019specht-high 
@@ -60,11 +63,11 @@ appropriate directory after conversion. All of the Thermo raw files can be
 downloaded with the following (assuming wget is available):
 
 ```bash
-mkdir -p data/2019basilicata-denovo/raw
-wget -N -P data/2019basilicata-denovo/raw ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2018/09/PXD009317/*.raw
+mkdir -p data/raw/2019basilicata-denovo
+wget -N -P data/raw/2019basilicata-denovo ftp://ftp.pride.ebi.ac.uk/pride/data/archive/2018/09/PXD009317/*.raw
 
-mkdir -p data/2019specht-high/raw
-wget -N -P data/2019specht-high/raw ftp://massive.ucsd.edu/MSV000083945/raw/scope2_raw/*.raw
+mkdir -p data/raw/2019specht-high
+wget -N -P data/raw/2019specht-high ftp://massive.ucsd.edu/MSV000083945/raw/scope2_raw/*.raw
 ```
 
 Given the size of the Kim *et al.* draft map of the human proteome dataset,
@@ -101,4 +104,11 @@ To run the analysis of SCoPE-MS experiments:
 cd scripts/scope-ms && python runall.py
 ```
 
+## Results
 
+All of the result files are written to the results directory. Intermediate files
+are written within in scripts, within the respective subdirectory
+
+## Questions?  
+
+If you have problems or questions, feel free ask Will Fondrie (wfondrie@uw.edu).
