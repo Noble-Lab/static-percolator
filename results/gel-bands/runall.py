@@ -15,8 +15,8 @@ import wispy.percolator
 from targetdecoy import qvalues
 
 # Setup -----------------------------------------------------------------------
-MZML = os.path.join("data", "2019basilicata-denovo", "mzML")
-FASTA = os.path.join("data", "fasta", "human.fasta")
+MZML = os.path.join("..", "..","data", "2019basilicata-denovo", "mzML")
+FASTA = os.path.join("..", "..","data", "fasta", "human.fasta")
 
 np.random.seed(78272)
 

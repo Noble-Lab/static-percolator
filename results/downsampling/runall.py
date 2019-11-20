@@ -21,7 +21,7 @@ import wispy.theme
 random.seed(42)
 np.random.seed(651)
 
-SOURCE_FILE = os.path.join("data", "pin", "kim.pin.gz")
+SOURCE_FILE = os.path.join("..", "..", "data", "pin", "kim.pin.gz")
 NUM_LINES = 23330312
 TRAIN_SAMPLE = int(1e6)
 TEST_SAMPLE = 100000
