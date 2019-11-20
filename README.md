@@ -11,7 +11,7 @@ present.
 
 ### Required Software
 The analysis scripts are written for Python 3.7+ and also require a recent
-version of the crux mass spectrometry toolkit.
+version of the [Crux mass spectrometry toolkit](https://crux.ms).
 
 Specifically, we recommend using the Anaconda Python distribution and running
 the following commands to verify the prerequisite software are installed:
@@ -29,7 +29,7 @@ pip install git+git://github.com/wfondrie/wispy
 pip install git+git://github.com/wfondrie/targetdecoy
 ```
 
-Finally, you will also need a recent version of [Crux tookit](crux.ms). Navigate
+Finally, you will also need a recent version of [Crux tookit](http://crux.ms). Navigate
 to the "Download" page, select an appropriate version and click "I agree to the
 licensing terms, download the most recent build of Crux". You will then need to
 verify Crux has been added to your path.
