@@ -1,5 +1,5 @@
 """
-Search and percolator some gel bands
+Search and percolate gel bands
 """
 import os
 import glob
@@ -9,16 +9,14 @@ import subprocess
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 import wispy.theme
 import wispy.percolator
 from targetdecoy import qvalues
 
 # Setup -----------------------------------------------------------------------
-MZML = "/net/noble/vol1/data/crux-datasets/2019basilicata-denovo/mzML"
-FASTA = "/net/noble/vol1/data/crux-datasets/2019basilicata-denovo/fasta"
-WEIGHTS = "../191014_scope-ms/perc-out/qc.percolator.weights.txt"
+MZML = os.path.join("data", "2019basilicata-denovo", "mzML")
+FASTA = os.path.join("data", "fasta", "human.fasta")
 
 np.random.seed(78272)
 
@@ -153,7 +151,6 @@ def plot_figures(res_df, gain_df, ann_points, thold, res=300):
     ax.axhline(0, color="black", linestyle="dashed", linewidth=1, zorder=0)
     ax.scatter(gain_df.conf, gain_df.gain1 * 100, label="1% FDR", s=10,
                edgecolor="white", linewidth=0.25)
-    #ax.scatter(gain_df.conf, gain_df.gain2 * 100, label="5% FDR", s=10)
 
     point_locs = ((2100, 23), (2500, 3))
     for txt_loc, point, lab in zip(point_locs, ann_points, ("B", "C")):
@@ -163,12 +160,9 @@ def plot_figures(res_df, gain_df, ann_points, thold, res=300):
                   "shrinkA": 1, "shrinkB": 3, "relpos": (0, 0.5)}
         ax.annotate(lab, loc1, xytext=txt_loc, ha="left", va="center",
                     size="small", weight="semibold", arrowprops=arrows)
-     #   ax.annotate("", loc1, xytext=txt_loc, arrowprops=arrows)
-     #   ax.annotate("", loc2, xytext=txt_loc, arrowprops=arrows)
 
     ax.text(-0.1, 1.15, "A", transform=ax.transAxes,
             fontsize=12, fontweight="bold", va="top", ha="right")
-    #ax.legend(frameon=False, handletextpad=0)
     ax.set_xlabel("Confident PSMs (Tide 1% FDR)")
     ax.set_ylabel("Peptides Gained by\nStatic Model (%)")
 
@@ -196,7 +190,7 @@ def plot_figures(res_df, gain_df, ann_points, thold, res=300):
 def main():
     """The main function"""
     logging.basicConfig(level=logging.INFO)
-    palette = wispy.theme.paper()
+    _ = wispy.theme.paper()
 
     # Make index
     tide_idx = make_index(FASTA, "human.index")
@@ -204,11 +198,11 @@ def main():
     # Search and Percolate training files
     train_name = "train"
     train_files = (glob.glob(os.path.join(MZML, "*I-gb*.mzML.gz")) +
-		           glob.glob(os.path.join(MZML, "*H-gb*.mzML.gz")))
+                   glob.glob(os.path.join(MZML, "*H-gb*.mzML.gz")))
 
     train_tide = tide_search(train_files, train_name, tide_idx)
     train_pin = tide2pin(*train_tide, train_name)
-    train_out = percolate(train_pin, train_name)
+    _ = percolate(train_pin, train_name)
     weights = os.path.join("perc-out", "train.percolator.weights.txt")
 
 
@@ -227,7 +221,6 @@ def main():
         tide_res = tide_search(mz_file, name, tide_idx)
         pin = tide2pin(*tide_res, name)
         normal.append(percolate(pin, name + ".normal"))
-        #static.append(percolate(pin, name + ".other", weights=WEIGHTS))
         static.append(percolate(pin, name + ".static", weights=weights))
         tide_conf = read_perc(assign_confidence(tide_res[0], name))
         tide.append((tide_conf["tdc q-value"] <= 0.01).sum())
@@ -267,8 +260,6 @@ def main():
 
 if __name__ == "__main__":
     x = main()
-    a = x[1][(x[1].samp == "MSB27866A") & (x[1]["percolator q-value"] <= 0.1)]
-    print(x[0])
     pos = (x[0].gain1 > 0).sum()
     print(f"Number with more peptides at 1% FDR: {pos}")
     print(f"Total number of runs: {len(x[0])}")

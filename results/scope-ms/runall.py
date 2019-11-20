@@ -2,7 +2,6 @@
 Search and run Percolator on the single cell data.
 """
 import os
-import sys
 import glob
 import logging
 import subprocess
@@ -10,43 +9,18 @@ import subprocess
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.font_manager
-from matplotlib.collections import PatchCollection
-from matplotlib.patches import Rectangle
-
 import seaborn as sns
-from tqdm import tqdm
-from targetdecoy import qvalues
 
 import wispy.theme
 import wispy.percolator
 
 # Setup -----------------------------------------------------------------------
-MZML = "/scratch/wfondrie/2019specht-high/mzml"
-FASTA = "../../../data/fasta/human_swissprot_2019-09.fasta"
+MZML = os.path.join("data", "2019specht-high", "mzML")
+FASTA = os.path.join("data", "fasta", "human.fasta")
 
 np.random.seed(2815)
 
 # Functions -------------------------------------------------------------------
-def set_figure_style(fg_color, accent):
-    "Set the figure style"
-    matplotlib.font_manager.findSystemFonts()
-    style = {"axes.edgecolor": fg_color,
-             "axes.labelcolor": fg_color,
-             "text.color": fg_color,
-             "xtick.color": fg_color,
-             "ytick.color": fg_color,
-             "font.family": "sans-serif",
-             "font.sans-serif": ["Roboto"]}
-
-    palette = sns.color_palette([accent, fg_color])
-
-    plt.rcParams["legend.frameon"] = False
-    sns.set_context("poster", rc={"lines.linewidth": 4})
-    sns.set_palette(palette)
-    sns.set_style("ticks", style)
-
-
 def read_perc(psm_file):
     """Read a Percolator tab-delimited file"""
     psms_df = wispy.percolator.read(psm_file)
@@ -88,7 +62,6 @@ def tide_search(mzml_files, name, index):
 
     if not all_exist:
         cmd = ["crux", "tide-search",
-               # Added 10/11/19
                "--remove-precursor-peak", "T",
                "--auto-precursor-window", "warn",
                "--isotope-error", "1",
@@ -99,7 +72,6 @@ def tide_search(mzml_files, name, index):
                "--compute-sp", "T",
                "--exact-p-value", "T",
                "--score-function", "both",
-               #---------------------
                "--fileroot", name,
                "--output-dir", "tide-out"]
 
@@ -149,34 +121,6 @@ def percolate(pin_file, name, weights=None):
         subprocess.run(cmd + [pin_file])
 
     return out_files
-
-
-def plot_point_diff(df, ax=None, width=0.5, size=15):
-    """Plot the point difference plot suggested by Jacob"""
-    if ax is None:
-        ax = plt.gca()
-
-    for i, group_df in enumerate(df.groupby("model")):
-        if not i:
-            yend = group_df[1].sequence
-            yend.index = group_df[1].sample_idx.values
-        else:
-            ystart = group_df[1].sequence
-            ystart.index = group_df[1].sample_idx.values
-
-        ax.scatter(group_df[1].sample_idx, group_df[1].sequence,
-                   label=group_df[0], zorder=3-i, s=size)
-
-    boxes = []
-    rect_df = pd.DataFrame({"ystart": ystart, "yend": yend})
-    rect_df["diff"] = rect_df.ystart - rect_df.yend
-    for i, row in rect_df.iterrows():
-        boxes.append(Rectangle((float(i) - width/2, row.yend),
-                               width, row["diff"]))
-
-    pc = PatchCollection(boxes, facecolors="grey", zorder=1)
-    ax.add_collection(pc)
-    return ax
 
 
 def match_num(num_df, res_df):
@@ -304,8 +248,7 @@ def plot_figures(res_df, psm_df, thold, res=300):
 def main():
     """The main function"""
     logging.basicConfig(level=logging.INFO)
-    #set_figure_style(FG_COLOR, ACCENT)
-    palette = wispy.theme.paper()
+    _ = wispy.theme.paper()
     plt.rcParams["legend.frameon"] = False
 
 
@@ -317,7 +260,7 @@ def main():
     qc_files = glob.glob(os.path.join(MZML, "*_QC_*.mzML.gz"))
     qc_tide = tide_search(qc_files, qc_name, tide_idx)
     qc_pin = tide2pin(*qc_tide, name=qc_name)
-    qc_out = percolate(qc_pin, qc_name)
+    _ = percolate(qc_pin, qc_name)
     weights = os.path.join("perc-out", "qc.percolator.weights.txt")
 
     # Analyze the SC files

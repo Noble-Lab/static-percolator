@@ -3,7 +3,6 @@ This module tests the effects of sample size on Percolator results.
 """
 import os
 import re
-import glob
 import gzip
 import random
 import logging
@@ -22,7 +21,7 @@ import wispy.theme
 random.seed(42)
 np.random.seed(651)
 
-SOURCE_FILE = "../../../../2018_wfondrie_msxl/data/pin/kim.pin.gz"
+SOURCE_FILE = os.path.join("data", "pin", "kim.pin.gz")
 NUM_LINES = 23330312
 TRAIN_SAMPLE = int(1e6)
 TEST_SAMPLE = 100000
@@ -175,35 +174,6 @@ def count_passing(df, thold=0.01):
     return ret_df.reset_index()
 
 
-def make_slide_figures(all_df, conf_df, res=100):
-    """Make cool plots for slides"""
-    wispy.theme.talk()
-    # Plot seed vs seed q-value curves ----------------------------------------
-    wide_all = widen(all_df[all_df.major])
-    wide_conf = widen(conf_df[conf_df.major])
-
-    fig, axs = plt.subplots(1, 4, figsize=(19, 5), sharey=True)
-    plot_btw_qvalues(wide_all, axs.flatten(), size=50, lw=4)
-    plt.savefig("figures/all_qvalue_talk.png", dpi=res)
-
-    fig, axs = plt.subplots(1, 4, figsize=(19, 5), sharey=True)
-    plot_btw_qvalues(wide_conf, axs.flatten(), size=50, lw=4)
-    plt.savefig("figures/conf_qvalue_talk.png", dpi=res)
-
-    # Plot the number of passing PSMs -----------------------------------------
-    fig, axs = plt.subplots(1, 2, figsize=(19, 8))
-    passing_all = count_passing(all_df)
-    plot_psms(passing_all, axs[0])
-    axs[0].set_xlabel("Total Training PSMs")
-    passing_conf = count_passing(conf_df)
-    plot_psms(passing_conf, axs[1])
-    axs[1].set_xlabel("Confident Training PSMs")
-    plt.tight_layout()
-    plt.savefig("figures/passing-psms_talk.png", dpi=res)
-
-    return passing_all, passing_conf
-
-
 def make_figures(all_df, conf_df, res=300):
     """Make cool plots"""
     # Plot seed vs seed q-value curves ----------------------------------------
@@ -246,7 +216,7 @@ def make_figures(all_df, conf_df, res=300):
 def plot_psms(df, ax, rev=True):
     """Plot the number of PSMs accepted"""
     ax.set(xscale="log")
-    p = sns.lineplot(x=df.samp, y=df.passing, ci=95, marker="o", ax=ax)
+    sns.lineplot(x=df.samp, y=df.passing, ci=95, marker="o", ax=ax)
     ax.set_ylabel("Accepted Test PSMs")
     plt.tight_layout()
 
@@ -260,7 +230,6 @@ def plot_qvalues(df, axs, labels):
     labels.reverse()
     axs = np.flip(axs)
     for i, group, ax in zip(range(len(axs)), df.groupby("samp"), axs):
-        samp = group[0]
         samp_df = group[1]
         ax.axhline(0.01, color="black", linewidth=1, linestyle="dashed")
         ax.axvline(0.01, color="black", linewidth=1, linestyle="dashed")
@@ -325,7 +294,7 @@ def format_label(num):
 def main():
     """The main function"""
     logging.basicConfig(level=logging.INFO)
-    palette = wispy.theme.paper()
+    _ = wispy.theme.paper()
     prepare_dirs()
 
     out_dfs = ["df-out/overall_res.pkl",
@@ -429,6 +398,4 @@ def main():
 if __name__ == "__main__":
     overall, conf = main()
     logging.info("Making Figures...")
-    x = make_figures(overall, conf)
-    make_slide_figures(overall, conf)
-    print(x[1])
+    make_figures(overall, conf)
