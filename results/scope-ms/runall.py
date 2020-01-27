@@ -237,8 +237,34 @@ def plot_figures(res_df, psm_df, thold, res=300):
     ax.text(-0.1, 1.15, "B", transform=ax.transAxes,
             fontsize=12, fontweight="bold", va="top", ha="right")
 
+    # For response ------------------------------------------------------------
+    sel_samps = np.random.choice(res_df.samp.unique(), 6, replace=False)
+    small_df = res_df.loc[res_df.samp.isin(sel_samps)]
+    small_reps = count_reps(small_df, thold=thold)
+    small_diff = small_reps[models[1]].values - small_reps[models[0]].values
+
+    ax = fig.add_subplot(223)
+    ax.axhline(0, color="black", linewidth=1, linestyle="dashed")
+    ax.plot(small_reps.reps, small_diff)
+    ax.set_xlabel("Minimum Number of Experiments Detected")
+    ax.set_ylabel("Peptides Gained by\nStatic Model")
+    ax.text(-0.1, 1.15, "B", transform=ax.transAxes,
+            fontsize=12, fontweight="bold", va="top", ha="right")
+
+    fig.align_ylabels()
     plt.tight_layout()
     plt.savefig("figures/scope_supp.png", dpi=res)
+    plt.close()
+
+
+    fig, ax = plt.subplots(1, 1, figsize=(3.5, 2.5))
+    ax.axhline(0, color="black", linewidth=1, linestyle="dashed")
+    ax.plot(small_reps.reps, small_diff)
+    ax.set_xlabel("Minimum Number of Experiments Detected")
+    ax.set_ylabel("Peptides Gained by Static Model")
+    fig.align_ylabels()
+    plt.tight_layout()
+    plt.savefig("figures/rep_numbers_small.png", dpi=res)
     plt.close()
 
     return nums, pd.DataFrame({"reps": res_reps.reps, "diff": res_diff})

@@ -90,7 +90,8 @@ in easy:
 
 To run the downsampling experiments:
 ```
-cd results/downsampling && python runall.py
+cd results/repeated-downsampling && python runall.py
+cd results/seed-downsampling && python runall.py
 ```
 
 To run the analysis of histone gel bands:
