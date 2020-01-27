@@ -75,7 +75,7 @@ we've provided the Percolator input file (pin) for the entire dataset via
 Run the following commands to download it into the correct location:
 
 ```bash
-mkdir -p ./data/pin/kim.pin.gz
+mkdir -p ./data/pin
 wget -N -O ./data/pin/kim.pin.gz https://ndownloader.figshare.com/files/19068101
 ```
 

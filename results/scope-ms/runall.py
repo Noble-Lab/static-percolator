@@ -15,8 +15,8 @@ import wispy.theme
 import wispy.percolator
 
 # Setup -----------------------------------------------------------------------
-MZML = os.path.join("data", "2019specht-high", "mzML")
-FASTA = os.path.join("data", "fasta", "human.fasta")
+MZML = os.path.join("..", "..", "data", "2019specht-high", "mzML")
+FASTA = os.path.join("..", "..", "data", "fasta", "human.fasta")
 
 np.random.seed(2815)
 
